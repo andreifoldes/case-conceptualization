@@ -386,6 +386,33 @@ body {
   padding: 0.25rem 0;
 }
 
+.view-toggle-btn {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--slate-200);
+  border-radius: 999px;
+  background: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--slate-500);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.view-toggle-btn:hover { border-color: var(--blue); color: var(--blue); }
+.view-toggle-btn.active { background: var(--blue); border-color: var(--blue); color: white; }
+
+.item-tag {
+  display: inline-block;
+  font-size: 0.625rem;
+  font-weight: 700;
+  background: var(--slate-100);
+  color: var(--slate-500);
+  padding: 0.0625rem 0.375rem;
+  border-radius: 4px;
+  margin-right: 0.25rem;
+  vertical-align: middle;
+}
+
 /* Action bar */
 .action-bar {
   display: flex;
@@ -772,6 +799,13 @@ function updateChart() {
   radarChart.update();
 }
 
+let summaryView = 'dimensions'; // 'dimensions' or 'items'
+
+function toggleSummaryView(view) {
+  summaryView = view;
+  updateSummary();
+}
+
 function updateSummary() {
   const panel = document.getElementById('summaryPanel');
   const ratedCount = Object.keys(ratings).length;
@@ -795,29 +829,17 @@ function updateSummary() {
     }
   });
 
-  // Dimension scores
-  const scores = DIMENSIONS.map(d => ({label: d.label.replace('\n',' '), score: dimScore(d), ratedCount: ITEMS.filter(d.filter).filter(it => ratings[it.id] !== undefined).length}))
-    .filter(s => s.ratedCount > 0);
+  // View toggle
+  html += `<div style="display:flex;gap:0.25rem;margin-top:0.75rem;margin-bottom:0.5rem">
+    <button class="view-toggle-btn${summaryView==='dimensions'?' active':''}" onclick="toggleSummaryView('dimensions')">By Dimension</button>
+    <button class="view-toggle-btn${summaryView==='items'?' active':''}" onclick="toggleSummaryView('items')">By Item</button>
+  </div>`;
 
-  // Strengths (>= 4.0)
-  const strengths = scores.filter(s => s.score >= 4.0).sort((a,b) => b.score - a.score);
-  html += '<div class="section-label">Strengths</div>';
-  if (strengths.length) {
-    strengths.forEach(s => {
-      html += `<div class="strength-item"><span><span class="dot">\u25CF </span>${s.label}</span><span>${s.score.toFixed(1)}</span></div>`;
-    });
+  if (summaryView === 'dimensions') {
+    html += renderDimensionView();
   } else {
-    html += '<div class="no-data">No dimensions at 4.0+ yet</div>';
+    html += renderItemView();
   }
-
-  // Growth areas (<= 2.0, or 3 lowest)
-  const sorted = [...scores].sort((a,b) => a.score - b.score);
-  const growth = sorted.filter(s => s.score <= 2.0);
-  const growthList = growth.length > 0 ? growth : sorted.slice(0, 3);
-  html += '<div class="section-label">Growth Areas</div>';
-  growthList.forEach(s => {
-    html += `<div class="growth-item"><span><span class="dot">\u25CF </span>${s.label}</span><span>${s.score.toFixed(1)}</span></div>`;
-  });
 
   // Profile text
   html += '<div class="section-label">Profile</div>';
@@ -830,6 +852,72 @@ function updateSummary() {
 
   panel.innerHTML = html;
 }
+
+function renderDimensionView() {
+  const scores = DIMENSIONS.map(d => ({label: d.label.replace('\n',' '), score: dimScore(d), ratedCount: ITEMS.filter(d.filter).filter(it => ratings[it.id] !== undefined).length}))
+    .filter(s => s.ratedCount > 0);
+
+  let html = '';
+  const strengths = scores.filter(s => s.score >= 4.0).sort((a,b) => b.score - a.score);
+  html += '<div class="section-label">Strengths</div>';
+  if (strengths.length) {
+    strengths.forEach(s => {
+      html += `<div class="strength-item"><span><span class="dot">\u25CF </span>${s.label}</span><span>${s.score.toFixed(1)}</span></div>`;
+    });
+  } else {
+    html += '<div class="no-data">No dimensions at 4.0+ yet</div>';
+  }
+
+  const sorted = [...scores].sort((a,b) => a.score - b.score);
+  const growth = sorted.filter(s => s.score <= 2.0);
+  const growthList = growth.length > 0 ? growth : sorted.slice(0, 3);
+  html += '<div class="section-label">Growth Areas</div>';
+  growthList.forEach(s => {
+    html += `<div class="growth-item"><span><span class="dot">\u25CF </span>${s.label}</span><span>${s.score.toFixed(1)}</span></div>`;
+  });
+  return html;
+}
+
+function renderItemView() {
+  const ratedItems = ITEMS.filter(it => ratings[it.id] !== undefined)
+    .map(it => ({...it, score: ratings[it.id]}));
+
+  let html = '';
+
+  // Top strengths: items rated 4 or 5
+  const topItems = ratedItems.filter(it => it.score >= 4).sort((a,b) => b.score - a.score);
+  html += '<div class="section-label">Strengths (rated 4-5)</div>';
+  if (topItems.length) {
+    topItems.slice(0, 8).forEach(it => {
+      const tag = `${it.box} ${it.level[0]}`;
+      html += `<div class="strength-item" style="gap:0.5rem"><span><span class="dot">\u25CF </span><span class="item-tag">${tag}</span> ${truncate(it.text, 60)}</span><span>${it.score}</span></div>`;
+    });
+    if (topItems.length > 8) {
+      html += `<div class="no-data">+${topItems.length - 8} more items at 4-5</div>`;
+    }
+  } else {
+    html += '<div class="no-data">No items rated 4+ yet</div>';
+  }
+
+  // Growth: items rated 0-2
+  const lowItems = ratedItems.filter(it => it.score <= 2).sort((a,b) => a.score - b.score);
+  html += '<div class="section-label">Growth Areas (rated 0-2)</div>';
+  if (lowItems.length) {
+    lowItems.slice(0, 8).forEach(it => {
+      const tag = `${it.box} ${it.level[0]}`;
+      html += `<div class="growth-item" style="gap:0.5rem"><span><span class="dot">\u25CF </span><span class="item-tag">${tag}</span> ${truncate(it.text, 60)}</span><span>${it.score}</span></div>`;
+    });
+    if (lowItems.length > 8) {
+      html += `<div class="no-data">+${lowItems.length - 8} more items at 0-2</div>`;
+    }
+  } else {
+    html += '<div class="no-data">No items rated 0-2</div>';
+  }
+
+  return html;
+}
+
+function truncate(s, n) { return s.length > n ? s.slice(0, n) + '\u2026' : s; }
 
 function exportCSV() {
   let csv = 'Box,Title,Skill Level,Category,Competency,Rating\n';
