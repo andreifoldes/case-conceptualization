@@ -780,6 +780,32 @@ function setRating(id, val) {
   updateBadges();
   updateChart();
   updateSummary();
+  checkAutoAdvance(id);
+}
+
+function checkAutoAdvance(ratedId) {
+  const item = ITEMS.find(it => it.id === ratedId);
+  if (!item) return;
+  const activeBox = item.box;
+  const boxItems = getBoxItems(activeBox);
+  const allRated = boxItems.every(it => ratings[it.id] !== undefined);
+  if (!allRated) return;
+
+  // Find next incomplete box
+  const boxOrder = BOXES.map(b => b.id);
+  const currentIdx = boxOrder.indexOf(activeBox);
+  for (let i = 1; i < boxOrder.length; i++) {
+    const nextBox = boxOrder[(currentIdx + i) % boxOrder.length];
+    const nextItems = getBoxItems(nextBox);
+    const hasIncomplete = nextItems.some(it => ratings[it.id] === undefined);
+    if (hasIncomplete) {
+      setTimeout(() => {
+        switchTab(nextBox);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 400);
+      return;
+    }
+  }
 }
 
 function updateItemUI(id, val) {
