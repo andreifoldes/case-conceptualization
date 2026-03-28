@@ -127,6 +127,8 @@ body {
 
 .tab-btn.active .tab-badge { background: var(--blue); color: white; }
 
+.tabs-bottom { margin-top: 0.5rem; margin-bottom: 0; }
+
 /* Legend */
 .legend-toggle {
   display: flex;
@@ -449,7 +451,7 @@ body {
   .container { max-width: 100%; padding: 0; }
 
   /* Hide interactive elements */
-  .tabs, .action-bar, .legend-toggle, .legend-content,
+  .tabs, .tabs-bottom, .action-bar, .legend-toggle, .legend-content,
   .progress-wrap, .progress-text, .view-toggle-btn, footer { display: none !important; }
 
   /* Hide all item cards - only show summary */
@@ -551,6 +553,8 @@ body {
   </div>
 
   <div id="tabContent"></div>
+
+  <div class="tabs tabs-bottom" id="tabsBottom"></div>
 
   <div class="print-items-table" id="printItemsTable" style="display:none"></div>
 
@@ -705,14 +709,15 @@ function getBoxItems(boxId) { return ITEMS.filter(i => i.box === boxId); }
 function ratingColor(v) { return v <= 1 ? 'rating-low' : v <= 3 ? 'rating-mid' : 'rating-high'; }
 
 function buildTabs() {
-  const el = document.getElementById('tabs');
-  el.innerHTML = BOXES.map((b, i) => {
+  const tabHtml = BOXES.map((b, i) => {
     const items = getBoxItems(b.id);
     const rated = items.filter(it => ratings[it.id] !== undefined).length;
     return `<button class="tab-btn${i===0?' active':''}" data-box="${b.id}" onclick="switchTab('${b.id}')">
-      ${b.label} <span class="tab-badge" id="badge-${b.id}">${rated}/${items.length}</span>
+      ${b.label} <span class="tab-badge badge-${b.id}">${rated}/${items.length}</span>
     </button>`;
   }).join('');
+  document.getElementById('tabs').innerHTML = tabHtml;
+  document.getElementById('tabsBottom').innerHTML = tabHtml;
 }
 
 function buildTabContent() {
@@ -800,8 +805,9 @@ function updateBadges() {
   BOXES.forEach(b => {
     const items = getBoxItems(b.id);
     const rated = items.filter(it => ratings[it.id] !== undefined).length;
-    const badge = document.getElementById('badge-' + b.id);
-    if (badge) badge.textContent = `${rated}/${items.length}`;
+    document.querySelectorAll('.badge-' + b.id).forEach(el => {
+      el.textContent = `${rated}/${items.length}`;
+    });
   });
 }
 
