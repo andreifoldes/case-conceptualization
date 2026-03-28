@@ -403,6 +403,23 @@ body {
 .view-toggle-btn:hover { border-color: var(--blue); color: var(--blue); }
 .view-toggle-btn.active { background: var(--blue); border-color: var(--blue); color: white; }
 
+.see-more-btn {
+  display: block;
+  width: 100%;
+  padding: 0.375rem;
+  margin-top: 0.25rem;
+  border: 1px dashed var(--slate-300);
+  border-radius: 6px;
+  background: transparent;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--blue);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.see-more-btn:hover { background: var(--blue-light); border-color: var(--blue); }
+
 .item-tag {
   display: inline-block;
   font-size: 0.625rem;
@@ -980,6 +997,40 @@ function renderDimensionView() {
   return html;
 }
 
+function renderCollapsibleList(items, cssClass, initialCount) {
+  let html = '';
+  const visible = items.slice(0, initialCount);
+  const hidden = items.slice(initialCount);
+  const listId = 'list-' + cssClass + '-' + Math.random().toString(36).slice(2,8);
+
+  visible.forEach(it => {
+    const tag = `${it.box} ${it.level[0]}`;
+    html += `<div class="${cssClass}-item" style="gap:0.5rem"><span><span class="dot">\u25CF </span><span class="item-tag">${tag}</span> ${truncate(it.text, 60)}</span><span>${it.score}</span></div>`;
+  });
+
+  if (hidden.length) {
+    html += `<div id="${listId}" style="display:none">`;
+    hidden.forEach(it => {
+      const tag = `${it.box} ${it.level[0]}`;
+      html += `<div class="${cssClass}-item" style="gap:0.5rem"><span><span class="dot">\u25CF </span><span class="item-tag">${tag}</span> ${truncate(it.text, 60)}</span><span>${it.score}</span></div>`;
+    });
+    html += '</div>';
+    html += `<button class="see-more-btn" onclick="toggleSeeMore(this,'${listId}')">Show ${hidden.length} more</button>`;
+  }
+  return html;
+}
+
+function toggleSeeMore(btn, listId) {
+  const list = document.getElementById(listId);
+  if (list.style.display === 'none') {
+    list.style.display = 'block';
+    btn.textContent = 'Show less';
+  } else {
+    list.style.display = 'none';
+    btn.textContent = `Show ${list.children.length} more`;
+  }
+}
+
 function renderItemView() {
   const ratedItems = ITEMS.filter(it => ratings[it.id] !== undefined)
     .map(it => ({...it, score: ratings[it.id]}));
@@ -990,13 +1041,7 @@ function renderItemView() {
   const topItems = ratedItems.filter(it => it.score >= 4).sort((a,b) => b.score - a.score);
   html += '<div class="section-label">Strengths (rated 4-5)</div>';
   if (topItems.length) {
-    topItems.slice(0, 8).forEach(it => {
-      const tag = `${it.box} ${it.level[0]}`;
-      html += `<div class="strength-item" style="gap:0.5rem"><span><span class="dot">\u25CF </span><span class="item-tag">${tag}</span> ${truncate(it.text, 60)}</span><span>${it.score}</span></div>`;
-    });
-    if (topItems.length > 8) {
-      html += `<div class="no-data">+${topItems.length - 8} more items at 4-5</div>`;
-    }
+    html += renderCollapsibleList(topItems, 'strength', 5);
   } else {
     html += '<div class="no-data">No items rated 4+ yet</div>';
   }
@@ -1005,13 +1050,7 @@ function renderItemView() {
   const lowItems = ratedItems.filter(it => it.score <= 2).sort((a,b) => a.score - b.score);
   html += '<div class="section-label">Growth Areas (rated 0-2)</div>';
   if (lowItems.length) {
-    lowItems.slice(0, 8).forEach(it => {
-      const tag = `${it.box} ${it.level[0]}`;
-      html += `<div class="growth-item" style="gap:0.5rem"><span><span class="dot">\u25CF </span><span class="item-tag">${tag}</span> ${truncate(it.text, 60)}</span><span>${it.score}</span></div>`;
-    });
-    if (lowItems.length > 8) {
-      html += `<div class="no-data">+${lowItems.length - 8} more items at 0-2</div>`;
-    }
+    html += renderCollapsibleList(lowItems, 'growth', 5);
   } else {
     html += '<div class="no-data">No items rated 0-2</div>';
   }
