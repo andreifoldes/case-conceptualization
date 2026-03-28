@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBT Therapist Self-Assessment</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue: #3B82F6;
+  --blue-light: #DBEAFE;
+  --blue-dark: #1E40AF;
+  --green: #22C55E;
+  --green-bg: #DCFCE7;
+  --amber: #F59E0B;
+  --amber-bg: #FEF3C7;
+  --red: #EF4444;
+  --red-bg: #FEE2E2;
+  --slate-50: #F8FAFC;
+  --slate-100: #F1F5F9;
+  --slate-200: #E2E8F0;
+  --slate-300: #CBD5E1;
+  --slate-400: #94A3B8;
+  --slate-500: #64748B;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1E293B;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--slate-50);
+  color: var(--slate-800);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--slate-800);
+  margin-bottom: 0.25rem;
+}
+
+.header .subtitle {
+  font-size: 0.875rem;
+  color: var(--slate-500);
+  margin-bottom: 1rem;
+}
+
+/* Progress bar */
+.progress-wrap {
+  background: var(--slate-200);
+  border-radius: 999px;
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.progress-bar {
+  background: var(--blue);
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.progress-text {
+  font-size: 0.75rem;
+  color: var(--slate-500);
+  text-align: right;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  flex: 1;
+  min-width: 140px;
+  padding: 0.625rem 0.75rem;
+  border: 2px solid var(--slate-200);
+  border-radius: var(--radius);
+  background: white;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--slate-600);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.tab-btn:hover { border-color: var(--blue); color: var(--blue); }
+.tab-btn.active { border-color: var(--blue); background: var(--blue-light); color: var(--blue-dark); }
+
+.tab-badge {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  background: var(--slate-200);
+  color: var(--slate-600);
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  margin-left: 0.25rem;
+}
+
+.tab-btn.active .tab-badge { background: var(--blue); color: white; }
+
+/* Legend */
+.legend-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--slate-100);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--slate-600);
+  margin-bottom: 1rem;
+  width: 100%;
+  text-align: left;
+}
+
+.legend-toggle .arrow { transition: transform 0.2s; }
+.legend-toggle.open .arrow { transform: rotate(90deg); }
+
+.legend-content {
+  display: none;
+  padding: 0.75rem 1rem;
+  background: white;
+  border: 1px solid var(--slate-200);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  margin-top: -1rem;
+  margin-bottom: 1rem;
+  font-size: 0.8125rem;
+  color: var(--slate-600);
+}
+
+.legend-content.open { display: block; }
+
+.legend-content dl { display: grid; grid-template-columns: 2rem 1fr; gap: 0.25rem 0.5rem; }
+.legend-content dt { font-weight: 700; color: var(--slate-800); }
+.legend-content dd { margin: 0; }
+
+/* Accordion */
+.accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: white;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius);
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--slate-700);
+  transition: background 0.15s;
+}
+
+.accordion-header:hover { background: var(--slate-50); }
+.accordion-header .arrow { transition: transform 0.2s; font-size: 0.75rem; color: var(--slate-400); }
+.accordion-header.open .arrow { transform: rotate(90deg); }
+
+.accordion-header .level-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+}
+
+.level-novice .level-badge { background: var(--green-bg); color: #166534; }
+.level-intermediate .level-badge { background: var(--amber-bg); color: #92400E; }
+.level-advanced .level-badge { background: #EDE9FE; color: #5B21B6; }
+
+.accordion-body {
+  display: none;
+  padding: 0 0 0.75rem 0;
+}
+
+.accordion-body.open { display: block; }
+
+/* Subcategory */
+.subcategory-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--slate-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem 0.375rem;
+}
+
+/* Cards */
+.item-card {
+  background: white;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius);
+  padding: 0.875rem 1rem;
+  margin-bottom: 0.5rem;
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s;
+}
+
+.item-card:hover { border-color: var(--slate-300); }
+
+.item-text {
+  font-size: 0.875rem;
+  color: var(--slate-700);
+  margin-bottom: 0.625rem;
+  line-height: 1.5;
+}
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.rating-row label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 32px;
+  border: 2px solid var(--slate-200);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--slate-500);
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.rating-row label:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--blue-light);
+}
+
+.rating-row input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.rating-row input[type="radio"]:checked + span {
+  /* handled via JS class on label */
+}
+
+.rating-row label.selected { border-color: var(--blue); background: var(--blue); color: white; }
+.rating-row label.rating-low.selected { border-color: var(--red); background: var(--red); color: white; }
+.rating-row label.rating-mid.selected { border-color: var(--amber); background: var(--amber); color: white; }
+.rating-row label.rating-high.selected { border-color: var(--green); background: var(--green); color: white; }
+
+.rating-row label:focus-within {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.rating-desc {
+  font-size: 0.6875rem;
+  color: var(--slate-400);
+  margin-left: 0.5rem;
+}
+
+/* Tab panes */
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* Results */
+.results {
+  margin-top: 2rem;
+  border-top: 2px solid var(--slate-200);
+  padding-top: 1.5rem;
+}
+
+.results h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--slate-800);
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .results-grid { grid-template-columns: 1fr; }
+}
+
+.chart-wrap {
+  background: white;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.chart-wrap canvas { max-width: 100%; }
+
+.summary-panel {
+  background: white;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.summary-panel h3 {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--slate-700);
+  margin-bottom: 0.75rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.375rem 0;
+  border-bottom: 1px solid var(--slate-100);
+  font-size: 0.8125rem;
+}
+
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: var(--slate-600); }
+.stat-value { font-weight: 700; color: var(--slate-800); }
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--slate-400);
+  margin-top: 1rem;
+  margin-bottom: 0.375rem;
+}
+
+.strength-item, .growth-item {
+  font-size: 0.8125rem;
+  padding: 0.25rem 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.strength-item .dot { color: var(--green); }
+.growth-item .dot { color: var(--red); }
+
+.no-data {
+  font-size: 0.8125rem;
+  color: var(--slate-400);
+  font-style: italic;
+  padding: 0.25rem 0;
+}
+
+/* Action bar */
+.action-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--slate-200);
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--slate-300);
+  border-radius: var(--radius);
+  background: white;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--slate-600);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.action-btn:hover { background: var(--slate-100); border-color: var(--slate-400); }
+.action-btn.primary { background: var(--blue); border-color: var(--blue); color: white; }
+.action-btn.primary:hover { background: var(--blue-dark); }
+.action-btn.danger { color: var(--red); }
+.action-btn.danger:hover { background: var(--red-bg); }
+
+/* Print */
+@media print {
+  body { background: white; }
+  .tabs, .action-bar, .legend-toggle, .legend-content { display: none !important; }
+  .tab-pane { display: block !important; }
+  .tab-pane::before { content: attr(data-title); display: block; font-size: 1.125rem; font-weight: 700; margin: 1rem 0 0.5rem; }
+  .accordion-body { display: block !important; }
+  .accordion-header .arrow { display: none; }
+  .item-card { box-shadow: none; break-inside: avoid; }
+  .results-grid { grid-template-columns: 1fr; }
+  .chart-wrap { break-inside: avoid; }
+  .progress-wrap, .progress-text { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <h1>CBT Case Conceptualization</h1>
+    <h1 style="font-size:1.125rem;font-weight:600;color:var(--slate-600);margin-bottom:0.25rem">Therapist Self-Assessment Tool</h1>
+    <p class="subtitle">Based on Kuyken, Padesky, &amp; Dudley (2008), Chapter 8</p>
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="progress-text" id="progressText">0 of 75 items rated (0%)</div>
+  </header>
+
+  <div class="tabs" id="tabs"></div>
+
+  <button class="legend-toggle" id="legendToggle" onclick="toggleLegend()">
+    <span class="arrow">&#9654;</span> Rating Scale (0-5)
+  </button>
+  <div class="legend-content" id="legendContent">
+    <dl>
+      <dt>0</dt><dd>Absence of declarative knowledge</dd>
+      <dt>1</dt><dd>Minimal declarative knowledge</dd>
+      <dt>2</dt><dd>Good declarative knowledge but little procedural skill</dd>
+      <dt>3</dt><dd>Good declarative knowledge with moderate procedural skill</dd>
+      <dt>4</dt><dd>Good declarative knowledge and good procedural skill with many but not most clients</dd>
+      <dt>5</dt><dd>Thorough declarative understanding integrated with flexible procedural skill</dd>
+    </dl>
+  </div>
+
+  <div id="tabContent"></div>
+
+  <section class="results">
+    <h2>Results</h2>
+    <div class="results-grid">
+      <div class="chart-wrap"><canvas id="radarChart"></canvas></div>
+      <div class="summary-panel" id="summaryPanel">
+        <h3>Summary</h3>
+        <div class="no-data">Rate items above to see your results.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="action-bar">
+    <button class="action-btn primary" onclick="exportCSV()">Export CSV</button>
+    <button class="action-btn" onclick="window.print()">Print Report</button>
+    <button class="action-btn danger" onclick="clearAll()">Clear All Ratings</button>
+  </div>
+
+  <footer style="text-align:center;padding:2rem 0 1rem;font-size:0.8125rem;color:var(--slate-400)">
+    Designed by 🐶 for 🐨 with Claude.
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ITEMS = [
+  {id:"8.1-N-01",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Novice",cat:"",text:"Know how to form and sustain a positive therapy alliance"},
+  {id:"8.1-N-02",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Novice",cat:"",text:"Communication skills: can communicate ideas clearly; can listen well and understand client communications; verbal and nonverbal expressions are congruent"},
+  {id:"8.1-N-03",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Novice",cat:"",text:"Understand the role of collaboration in CBT and how to collaborate to accomplish common tasks (e.g., agenda setting)"},
+  {id:"8.1-N-04",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Novice",cat:"",text:"Recognize the importance of therapy structure, including knowledge of how to negotiate tasks within the therapy hour (e.g., time spent on various topics)"},
+  {id:"8.1-N-05",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Novice",cat:"",text:"Understand how to use functional analysis and/or the five-part model"},
+  {id:"8.1-N-06",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Novice",cat:"",text:"Have basic familiarity with explanatory conceptualizations for common disorders such as depression, specific anxiety disorders, and other common presenting issues in the clinician\u2019s practice"},
+  {id:"8.1-N-07",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Novice",cat:"",text:"Know methods to identify and rate emotions, thoughts, and physiological phenomena"},
+  {id:"8.1-N-08",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Novice",cat:"",text:"Understand how to engage clients in behavioral observation"},
+  {id:"8.1-N-09",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Novice",cat:"",text:"Know the four stages of Socratic dialogue"},
+  {id:"8.1-N-10",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Novice",cat:"",text:"Have knowledge of cultural variations"},
+  {id:"8.1-N-11",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Novice",cat:"",text:"Know basics of how to set up and debrief behavioral experiments"},
+  {id:"8.1-N-12",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Novice",cat:"",text:"Know how to use Thought Records, prediction logs, and other written methods to observe and test beliefs"},
+  {id:"8.1-N-13",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Novice",cat:"",text:"Understand how to use relevant questions to gather the information necessary to form a case conceptualization"},
+  {id:"8.1-I-01",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Intermediate",cat:"",text:"Know how to adapt therapist language and metaphor to educational level, culture, and personal interests of client"},
+  {id:"8.1-I-02",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Intermediate",cat:"",text:"Recognize client experiences that fit with and contradict particular conceptual models"},
+  {id:"8.1-I-03",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Intermediate",cat:"",text:"Can engage clients so they actively search for links between different aspects of their experience (e.g., thoughts and feelings) outside of therapy sessions and report these to the therapist verbally and/or in writing"},
+  {id:"8.1-I-04",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Intermediate",cat:"",text:"Has clear understanding of cognitive conceptualizations for depression, anxiety disorders, and other problems common to the clinician\u2019s practice"},
+  {id:"8.1-I-05",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Intermediate",cat:"",text:"Aware of features that differentiate between similar presenting issues"},
+  {id:"8.1-I-06",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Intermediate",cat:"",text:"Is able to incorporate cultural factors into conceptualizations"},
+  {id:"8.1-I-07",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Intermediate",cat:"",text:"Can use Socratic dialogue to effectively test beliefs"},
+  {id:"8.1-I-08",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Intermediate",cat:"",text:"Can maintain objectivity and genuine curiosity about client experience; can flexibly adapt conceptualization to client feedback"},
+  {id:"8.1-I-09",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Intermediate",cat:"",text:"Can present evidence-based models to client that fit with client-reported experiences"},
+  {id:"8.1-I-10",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Intermediate",cat:"",text:"Can construct individualized conceptualizations that incorporate relevant evidence-based models"},
+  {id:"8.1-I-11",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Intermediate",cat:"",text:"Can make predictions and employ behavioral experiments to evaluate case conceptualization"},
+  {id:"8.1-A-01",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Advanced",cat:"",text:"Can navigate conflict and collaboratively work through therapy impasses"},
+  {id:"8.1-A-02",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Advanced",cat:"",text:"Is able to attain and maintain collaboration with most clients, including those who have great difficulty collaborating in relationships"},
+  {id:"8.1-A-03",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Advanced",cat:"",text:"Can create natural conversational bridges between client observations and empirically derived models"},
+  {id:"8.1-A-04",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Advanced",cat:"",text:"Is alert to subtleties in similarities and differences between client reports of experience and empirically supported models"},
+  {id:"8.1-A-05",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Advanced",cat:"",text:"Can use and/or seek data from client to reconcile differences between empirically supported models and client\u2019s personal experience"},
+  {id:"8.1-A-06",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Advanced",cat:"",text:"Is able to weave empirical methods seamlessly into the fabric of therapy"},
+  {id:"8.1-A-07",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Advanced",cat:"",text:"Can readily use case conceptualization to navigate therapy impasses, evaluate treatment options, and plan for relapse management"},
+  {id:"8.1-A-08",box:"8.1",title:"Collaborative Empiricism in Case Conceptualization",level:"Advanced",cat:"",text:"Is able to reflect on and identify personal biases that interfere with empirical processes"},
+  {id:"8.2-N-D-01",box:"8.2",title:"Levels of Conceptualization",level:"Novice",cat:"Descriptive level",text:"Can differentiate thoughts, moods, physical reactions, behaviors, and situational aspects of client experience"},
+  {id:"8.2-N-D-02",box:"8.2",title:"Levels of Conceptualization",level:"Novice",cat:"Descriptive level",text:"Understands purposes and rationale for presenting issues list"},
+  {id:"8.2-N-D-03",box:"8.2",title:"Levels of Conceptualization",level:"Novice",cat:"Descriptive level",text:"Understands principles and processes of functional analysis"},
+  {id:"8.2-N-D-04",box:"8.2",title:"Levels of Conceptualization",level:"Novice",cat:"Descriptive level",text:"Understands principles and processes of five-part model"},
+  {id:"8.2-N-D-05",box:"8.2",title:"Levels of Conceptualization",level:"Novice",cat:"Descriptive level",text:"Familiar with one or two evidence-based conceptualization models (e.g., panic disorder, OCD)"},
+  {id:"8.2-N-D-06",box:"8.2",title:"Levels of Conceptualization",level:"Novice",cat:"Descriptive level",text:"Understands goal-setting processes"},
+  {id:"8.2-N-E-01",box:"8.2",title:"Levels of Conceptualization",level:"Novice",cat:"Explanatory level",text:"Can identify automatic thoughts, underlying assumptions, and core beliefs"},
+  {id:"8.2-N-E-02",box:"8.2",title:"Levels of Conceptualization",level:"Novice",cat:"Explanatory level",text:"Understands generic cognitive model (see Chapter 1)"},
+  {id:"8.2-N-E-03",box:"8.2",title:"Levels of Conceptualization",level:"Novice",cat:"Explanatory level",text:"Can identify triggers and maintenance factors"},
+  {id:"8.2-N-E-04",box:"8.2",title:"Levels of Conceptualization",level:"Novice",cat:"Explanatory level",text:"Recognizes safety behaviors"},
+  {id:"8.2-N-E-05",box:"8.2",title:"Levels of Conceptualization",level:"Novice",cat:"Explanatory level",text:"Knows research regarding etiology, maintenance, and treatment for one or two common diagnoses"},
+  {id:"8.2-N-P-01",box:"8.2",title:"Levels of Conceptualization",level:"Novice",cat:"Predisposing and protective factors",text:"Knows CBT theory of personality development (Beck et al., 2004)"},
+  {id:"8.2-N-P-02",box:"8.2",title:"Levels of Conceptualization",level:"Novice",cat:"Predisposing and protective factors",text:"Knows at least one model for understanding resilience"},
+  {id:"8.2-N-P-03",box:"8.2",title:"Levels of Conceptualization",level:"Novice",cat:"Predisposing and protective factors",text:"Understands rationale for linking developmental history, presenting issues, and relapse management"},
+  {id:"8.2-I-D-01",box:"8.2",title:"Levels of Conceptualization",level:"Intermediate",cat:"Descriptive level",text:"Familiar with evidence-based diagnostic models for all common disorders in one\u2019s practice"},
+  {id:"8.2-I-E-01",box:"8.2",title:"Levels of Conceptualization",level:"Intermediate",cat:"Explanatory level",text:"Actively follows research regarding etiology, maintenance, and treatment for many common disorders in one\u2019s practice"},
+  {id:"8.2-I-E-02",box:"8.2",title:"Levels of Conceptualization",level:"Intermediate",cat:"Explanatory level",text:"Recognizes recurring themes across situational client examples"},
+  {id:"8.2-I-E-03",box:"8.2",title:"Levels of Conceptualization",level:"Intermediate",cat:"Explanatory level",text:"Possesses knowledge of a wide repertoire of CBT interventions and understands how to select these based on the conceptualization"},
+  {id:"8.2-I-E-04",box:"8.2",title:"Levels of Conceptualization",level:"Intermediate",cat:"Explanatory level",text:"Familiar with expected treatment length and outcomes based on knowledge of relevant research with various clinical populations"},
+  {id:"8.2-I-P-01",box:"8.2",title:"Levels of Conceptualization",level:"Intermediate",cat:"Predisposing and protective factors",text:"Aware of personality types as well as common underlying assumptions and core beliefs associated with each"},
+  {id:"8.2-I-P-02",box:"8.2",title:"Levels of Conceptualization",level:"Intermediate",cat:"Predisposing and protective factors",text:"Understands how to elicit metaphors, stories, and imagery from client that are linked to key themes and presenting issues"},
+  {id:"8.2-I-P-03",box:"8.2",title:"Levels of Conceptualization",level:"Intermediate",cat:"Predisposing and protective factors",text:"Understands how to formulate a longitudinal conceptualization for both presenting issues and also for client resilience"},
+  {id:"8.2-I-P-04",box:"8.2",title:"Levels of Conceptualization",level:"Intermediate",cat:"Predisposing and protective factors",text:"Able to identify possible risk factors for future relapse based on client longitudinal conceptualization"},
+  {id:"8.2-A-D-01",box:"8.2",title:"Levels of Conceptualization",level:"Advanced",cat:"Descriptive level",text:"Recognizes recurring themes in evidence-based models (e.g., rumination) and can identify themes that link client presenting issues"},
+  {id:"8.2-A-D-02",box:"8.2",title:"Levels of Conceptualization",level:"Advanced",cat:"Descriptive level",text:"Able to provide clinical rationale for when to use each level of conceptualization with a particular client"},
+  {id:"8.2-A-D-03",box:"8.2",title:"Levels of Conceptualization",level:"Advanced",cat:"Descriptive level",text:"Understands the rationale and methods for incorporating resilience at each level of conceptualization"},
+  {id:"8.2-A-E-01",box:"8.2",title:"Levels of Conceptualization",level:"Advanced",cat:"Explanatory level",text:"Regularly updates knowledge to integrate research findings from various CBT approaches and across many disorders"},
+  {id:"8.2-A-E-02",box:"8.2",title:"Levels of Conceptualization",level:"Advanced",cat:"Explanatory level",text:"Recognizes triggers and maintenance factors that are common to multiple client presenting issues"},
+  {id:"8.2-A-E-03",box:"8.2",title:"Levels of Conceptualization",level:"Advanced",cat:"Explanatory level",text:"Knows how to modify CBT interventions to match peculiarities of a client conceptualization or to adapt to treatment barriers"},
+  {id:"8.2-A-P-01",box:"8.2",title:"Levels of Conceptualization",level:"Advanced",cat:"Predisposing and protective factors",text:"Understands interview modifications that enhance CBT with various personality disorders (Beck et al., 2004)"},
+  {id:"8.2-A-P-02",box:"8.2",title:"Levels of Conceptualization",level:"Advanced",cat:"Predisposing and protective factors",text:"Knows how to integrate predisposing and protective factors within a longitudinal conceptualization"},
+  {id:"8.3-N-01",box:"8.3",title:"Incorporating Client Strengths",level:"Novice",cat:"",text:"Understands relevance of client strengths for case conceptualization"},
+  {id:"8.3-N-02",box:"8.3",title:"Incorporating Client Strengths",level:"Novice",cat:"",text:"Knows questions for eliciting client strengths (cf. Chapter 4)"},
+  {id:"8.3-N-03",box:"8.3",title:"Incorporating Client Strengths",level:"Novice",cat:"",text:"Can employ guided discovery methods to help clients identify strengths"},
+  {id:"8.3-N-04",box:"8.3",title:"Incorporating Client Strengths",level:"Novice",cat:"",text:"Able to observe unspoken strengths at least some of the time"},
+  {id:"8.3-N-05",box:"8.3",title:"Incorporating Client Strengths",level:"Novice",cat:"",text:"Knows positive psychology literature and understands empirical bases of a strengths focus"},
+  {id:"8.3-I-01",box:"8.3",title:"Incorporating Client Strengths",level:"Intermediate",cat:"",text:"Knows the resilience literature (see Chapter 4) and is familiar with diverse areas of strengths"},
+  {id:"8.3-I-02",box:"8.3",title:"Incorporating Client Strengths",level:"Intermediate",cat:"",text:"Understands how to incorporate strengths into conceptual models"},
+  {id:"8.3-I-03",box:"8.3",title:"Incorporating Client Strengths",level:"Intermediate",cat:"",text:"Able to observe unspoken strengths"},
+  {id:"8.3-A-01",box:"8.3",title:"Incorporating Client Strengths",level:"Advanced",cat:"",text:"Able to integrate strengths and difficulties seamlessly throughout each level of case conceptualization"},
+  {id:"8.3-A-02",box:"8.3",title:"Incorporating Client Strengths",level:"Advanced",cat:"",text:"Recognizes pathways to change within identified strengths"},
+  {id:"8.3-A-03",box:"8.3",title:"Incorporating Client Strengths",level:"Advanced",cat:"",text:"Observes and infers unspoken strengths and can facilitate client awareness of these throughout each stage of therapy"},
+  {id:"8.3-A-04",box:"8.3",title:"Incorporating Client Strengths",level:"Advanced",cat:"",text:"Integrates both strengths and resilience into treatment plans"}
+];
+
+const BOXES = [
+  {id:"8.1", label:"8.1 Collaborative Empiricism"},
+  {id:"8.2", label:"8.2 Levels of Conceptualization"},
+  {id:"8.3", label:"8.3 Client Strengths"}
+];
+
+const LEVELS = ["Novice","Intermediate","Advanced"];
+
+const DIMENSIONS = [
+  {key:"ce-n", label:"CE Novice", filter: i => i.box==="8.1" && i.level==="Novice"},
+  {key:"ce-i", label:"CE Intermediate", filter: i => i.box==="8.1" && i.level==="Intermediate"},
+  {key:"ce-a", label:"CE Advanced", filter: i => i.box==="8.1" && i.level==="Advanced"},
+  {key:"desc", label:"Descriptive", filter: i => i.box==="8.2" && i.cat==="Descriptive level"},
+  {key:"expl", label:"Explanatory", filter: i => i.box==="8.2" && i.cat==="Explanatory level"},
+  {key:"pred", label:"Predisposing/\nProtective", filter: i => i.box==="8.2" && i.cat==="Predisposing and protective factors"},
+  {key:"str-n", label:"Strengths Novice", filter: i => i.box==="8.3" && i.level==="Novice"},
+  {key:"str-i", label:"Strengths Intermediate", filter: i => i.box==="8.3" && i.level==="Intermediate"},
+  {key:"str-a", label:"Strengths Advanced", filter: i => i.box==="8.3" && i.level==="Advanced"}
+];
+
+const SCALE_LABELS = [
+  "Absence of declarative knowledge",
+  "Minimal declarative knowledge",
+  "Good declarative knowledge, little procedural skill",
+  "Good declarative knowledge, moderate procedural skill",
+  "Good declarative + good procedural (many clients)",
+  "Thorough understanding + flexible procedural skill"
+];
+
+const STORAGE_KEY = "cbt-self-assessment-ratings";
+let ratings = {};
+let radarChart = null;
+
+function loadRatings() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) ratings = JSON.parse(saved);
+  } catch(e) {}
+}
+
+function saveRatings() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(ratings)); } catch(e) {}
+}
+
+function getBoxItems(boxId) { return ITEMS.filter(i => i.box === boxId); }
+
+function ratingColor(v) { return v <= 1 ? 'rating-low' : v <= 3 ? 'rating-mid' : 'rating-high'; }
+
+function buildTabs() {
+  const el = document.getElementById('tabs');
+  el.innerHTML = BOXES.map((b, i) => {
+    const items = getBoxItems(b.id);
+    const rated = items.filter(it => ratings[it.id] !== undefined).length;
+    return `<button class="tab-btn${i===0?' active':''}" data-box="${b.id}" onclick="switchTab('${b.id}')">
+      ${b.label} <span class="tab-badge" id="badge-${b.id}">${rated}/${items.length}</span>
+    </button>`;
+  }).join('');
+}
+
+function buildTabContent() {
+  const wrap = document.getElementById('tabContent');
+  wrap.innerHTML = BOXES.map((b, i) => {
+    const items = getBoxItems(b.id);
+    let html = `<div class="tab-pane${i===0?' active':''}" id="pane-${b.id}" data-title="Box ${b.label}">`;
+    LEVELS.forEach((level, li) => {
+      const levelItems = items.filter(it => it.level === level);
+      if (!levelItems.length) return;
+      const levelKey = level[0].toLowerCase();
+      const openClass = li === 0 ? ' open' : '';
+      html += `<div class="accordion-header level-${level.toLowerCase()}${openClass}" onclick="toggleAccordion(this)">
+        <span>${level} <span class="level-badge">${levelItems.length} items</span></span>
+        <span class="arrow">&#9654;</span>
+      </div>
+      <div class="accordion-body${openClass}">`;
+      if (b.id === '8.2') {
+        const cats = [...new Set(levelItems.map(it => it.cat))];
+        cats.forEach(cat => {
+          html += `<div class="subcategory-label">${cat}</div>`;
+          levelItems.filter(it => it.cat === cat).forEach(it => { html += renderItem(it); });
+        });
+      } else {
+        levelItems.forEach(it => { html += renderItem(it); });
+      }
+      html += '</div>';
+    });
+    html += '</div>';
+    return html;
+  }).join('');
+}
+
+function renderItem(item) {
+  const val = ratings[item.id];
+  let radios = '';
+  for (let v = 0; v <= 5; v++) {
+    const sel = val === v;
+    const colorCls = sel ? ratingColor(v) : '';
+    radios += `<label class="${sel?'selected ':''} ${colorCls}" title="${SCALE_LABELS[v]}">
+      <input type="radio" name="${item.id}" value="${v}" ${sel?'checked':''}
+        onchange="setRating('${item.id}',${v})"><span>${v}</span>
+    </label>`;
+  }
+  const desc = val !== undefined ? SCALE_LABELS[val] : '';
+  return `<div class="item-card" id="card-${item.id}">
+    <div class="item-text">${item.text}</div>
+    <fieldset style="border:none;padding:0;margin:0">
+      <legend style="position:absolute;width:1px;height:1px;overflow:hidden">Rate: ${item.text}</legend>
+      <div class="rating-row">${radios}<span class="rating-desc" id="desc-${item.id}">${desc}</span></div>
+    </fieldset>
+  </div>`;
+}
+
+function setRating(id, val) {
+  ratings[id] = val;
+  saveRatings();
+  updateItemUI(id, val);
+  updateProgress();
+  updateBadges();
+  updateChart();
+  updateSummary();
+}
+
+function updateItemUI(id, val) {
+  const card = document.getElementById('card-' + id);
+  if (!card) return;
+  const labels = card.querySelectorAll('.rating-row label');
+  labels.forEach((lbl, i) => {
+    lbl.className = i === val ? `selected ${ratingColor(val)}` : '';
+  });
+  const desc = document.getElementById('desc-' + id);
+  if (desc) desc.textContent = SCALE_LABELS[val];
+}
+
+function updateProgress() {
+  const total = ITEMS.length;
+  const rated = Object.keys(ratings).length;
+  const pct = Math.round((rated / total) * 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${rated} of ${total} items rated (${pct}%)`;
+}
+
+function updateBadges() {
+  BOXES.forEach(b => {
+    const items = getBoxItems(b.id);
+    const rated = items.filter(it => ratings[it.id] !== undefined).length;
+    const badge = document.getElementById('badge-' + b.id);
+    if (badge) badge.textContent = `${rated}/${items.length}`;
+  });
+}
+
+function switchTab(boxId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.box === boxId));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'pane-' + boxId));
+}
+
+function toggleAccordion(el) {
+  el.classList.toggle('open');
+  const body = el.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+function toggleLegend() {
+  const toggle = document.getElementById('legendToggle');
+  const content = document.getElementById('legendContent');
+  toggle.classList.toggle('open');
+  content.classList.toggle('open');
+}
+
+function dimScore(dim) {
+  const items = ITEMS.filter(dim.filter);
+  const rated = items.filter(it => ratings[it.id] !== undefined);
+  if (!rated.length) return 0;
+  return rated.reduce((sum, it) => sum + ratings[it.id], 0) / rated.length;
+}
+
+function initChart() {
+  const ctx = document.getElementById('radarChart').getContext('2d');
+  radarChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: DIMENSIONS.map(d => d.label),
+      datasets: [{
+        label: 'Self-Assessment',
+        data: DIMENSIONS.map(d => dimScore(d)),
+        backgroundColor: 'rgba(59,130,246,0.15)',
+        borderColor: 'rgb(59,130,246)',
+        pointBackgroundColor: 'rgb(59,130,246)',
+        pointRadius: 4,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      scales: {
+        r: {
+          min: 0, max: 5,
+          ticks: { stepSize: 1, font: { size: 10 }, backdropColor: 'transparent' },
+          pointLabels: { font: { size: 11 } },
+          grid: { color: 'rgba(0,0,0,0.06)' },
+          angleLines: { color: 'rgba(0,0,0,0.06)' }
+        }
+      },
+      plugins: { legend: { display: false } },
+      responsive: true,
+      maintainAspectRatio: true
+    }
+  });
+}
+
+function updateChart() {
+  if (!radarChart) return;
+  radarChart.data.datasets[0].data = DIMENSIONS.map(d => dimScore(d));
+  radarChart.update();
+}
+
+function updateSummary() {
+  const panel = document.getElementById('summaryPanel');
+  const ratedCount = Object.keys(ratings).length;
+  if (ratedCount === 0) {
+    panel.innerHTML = '<h3>Summary</h3><div class="no-data">Rate items above to see your results.</div>';
+    return;
+  }
+
+  const allRated = ITEMS.filter(it => ratings[it.id] !== undefined);
+  const overall = allRated.reduce((s, it) => s + ratings[it.id], 0) / allRated.length;
+
+  let html = '<h3>Summary</h3>';
+
+  // Overall + per-box means
+  html += `<div class="stat-row"><span class="stat-label">Overall Mean</span><span class="stat-value">${overall.toFixed(1)}</span></div>`;
+  BOXES.forEach(b => {
+    const items = getBoxItems(b.id).filter(it => ratings[it.id] !== undefined);
+    if (items.length) {
+      const mean = items.reduce((s, it) => s + ratings[it.id], 0) / items.length;
+      html += `<div class="stat-row"><span class="stat-label">Box ${b.id}</span><span class="stat-value">${mean.toFixed(1)}</span></div>`;
+    }
+  });
+
+  // Dimension scores
+  const scores = DIMENSIONS.map(d => ({label: d.label.replace('\n',' '), score: dimScore(d), ratedCount: ITEMS.filter(d.filter).filter(it => ratings[it.id] !== undefined).length}))
+    .filter(s => s.ratedCount > 0);
+
+  // Strengths (>= 4.0)
+  const strengths = scores.filter(s => s.score >= 4.0).sort((a,b) => b.score - a.score);
+  html += '<div class="section-label">Strengths</div>';
+  if (strengths.length) {
+    strengths.forEach(s => {
+      html += `<div class="strength-item"><span><span class="dot">\u25CF </span>${s.label}</span><span>${s.score.toFixed(1)}</span></div>`;
+    });
+  } else {
+    html += '<div class="no-data">No dimensions at 4.0+ yet</div>';
+  }
+
+  // Growth areas (<= 2.0, or 3 lowest)
+  const sorted = [...scores].sort((a,b) => a.score - b.score);
+  const growth = sorted.filter(s => s.score <= 2.0);
+  const growthList = growth.length > 0 ? growth : sorted.slice(0, 3);
+  html += '<div class="section-label">Growth Areas</div>';
+  growthList.forEach(s => {
+    html += `<div class="growth-item"><span><span class="dot">\u25CF </span>${s.label}</span><span>${s.score.toFixed(1)}</span></div>`;
+  });
+
+  // Profile text
+  html += '<div class="section-label">Profile</div>';
+  let profile = '';
+  if (overall >= 4.0) profile = 'Your ratings suggest advanced-level competence across case conceptualization skills.';
+  else if (overall >= 3.0) profile = 'Your ratings suggest solid intermediate-level competence with emerging advanced skills.';
+  else if (overall >= 2.0) profile = 'Your ratings suggest developing competence with good declarative knowledge. Focus on building procedural skills through practice.';
+  else profile = 'Your ratings suggest early-stage development. Prioritize declarative learning through reading and workshops.';
+  html += `<p style="font-size:0.8125rem;color:var(--slate-600);margin-top:0.25rem">${profile}</p>`;
+
+  panel.innerHTML = html;
+}
+
+function exportCSV() {
+  let csv = 'Box,Title,Skill Level,Category,Competency,Rating\n';
+  ITEMS.forEach(it => {
+    const val = ratings[it.id] !== undefined ? ratings[it.id] : '';
+    const esc = s => s.includes(',') || s.includes('"') ? '"' + s.replace(/"/g,'""') + '"' : s;
+    csv += [it.box, esc(it.title), it.level, esc(it.cat), esc(it.text), val].join(',') + '\n';
+  });
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `cbt-self-assessment-${date}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function clearAll() {
+  if (!confirm('Clear all ratings? This cannot be undone.')) return;
+  ratings = {};
+  saveRatings();
+  buildTabContent();
+  updateProgress();
+  updateBadges();
+  updateChart();
+  updateSummary();
+}
+
+// Init
+loadRatings();
+buildTabs();
+buildTabContent();
+updateProgress();
+
+if (typeof Chart !== 'undefined') {
+  initChart();
+} else {
+  document.getElementById('radarChart').parentElement.innerHTML =
+    '<p style="color:var(--slate-400);font-size:0.875rem;padding:2rem;text-align:center">Chart.js failed to load. Summary data is still available.</p>';
+}
+updateSummary();
+</script>
+</body>
+</html>
